@@ -1,5 +1,3 @@
-Claro, Felipe! Aqui está uma versão aprimorada e profissional do seu README em português, com estrutura clara, linguagem objetiva e visual atrativo. Ele está pronto para ser usado no GitHub ou qualquer outro repositório público:
-
 🛡️ Web Vulnerability Scanner — OWASP Top 10
 Ferramenta automatizada para identificação de vulnerabilidades críticas em aplicações web, baseada no padrão global OWASP Top 10 (2021). Ideal para profissionais de segurança, desenvolvedores e equipes DevSecOps que buscam reforçar a segurança desde o desenvolvimento até a produção.
 
