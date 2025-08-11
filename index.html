@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Scanner Web UI</title>
+<style>
+  /* Reset básico */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  body {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #e0e6f0;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 15px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1 {
+    font-weight: 700;
+    font-size: 2.8rem;
+    margin-bottom: 10px;
+    text-shadow: 0 0 10px rgba(255,255,255,0.3);
+  }
+  label {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+    display: block;
+    letter-spacing: 0.02em;
+  }
+  textarea {
+    width: 100%;
+    max-width: 700px;
+    height: 140px;
+    padding: 12px 15px;
+    font-family: 'Fira Mono', monospace;
+    font-size: 1rem;
+    border-radius: 10px;
+    border: none;
+    resize: vertical;
+    box-shadow: 0 0 10px rgba(255 255 255 / 0.15);
+    background: rgba(255 255 255 / 0.1);
+    color: #eef2f7;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    caret-color: #00b4d8;
+  }
+  textarea::placeholder {
+    color: #a0b4cc;
+  }
+  textarea:focus {
+    outline: none;
+    background: rgba(255 255 255 / 0.2);
+    box-shadow: 0 0 15px #00b4d8;
+  }
+  button {
+    margin-top: 16px;
+    padding: 14px 40px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(45deg, #00b4d8, #0077b6);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 8px 15px rgba(0, 180, 216, 0.3);
+    transition: all 0.3s ease;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+  }
+  button:hover:not(:disabled) {
+    background: linear-gradient(45deg, #0077b6, #00b4d8);
+    box-shadow: 0 12px 20px rgba(0, 180, 216, 0.6);
+    transform: translateY(-3px);
+  }
+  button:active:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(0, 180, 216, 0.4);
+  }
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    box-shadow: none;
+    transform: none;
+  }
+  #progress {
+    margin-top: 18px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #00f6ff;
+    letter-spacing: 0.04em;
+    min-height: 32px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+  /* Spinner animado */
+  .spinner {
+    width: 22px;
+    height: 22px;
+    border: 3.5px solid rgba(0, 180, 216, 0.3);
+    border-top-color: #00f6ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  table {
+    margin-top: 28px;
+    width: 100%;
+    max-width: 900px;
+    border-collapse: separate;
+    border-spacing: 0 12px;
+    background: rgba(255 255 255 / 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease;
+  }
+  thead tr {
+    background: #0077b6;
+    color: #d0e6ff;
+  }
+  thead th {
+    padding: 14px 20px;
+    text-align: left;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    user-select: none;
+  }
+  tbody tr {
+    background: rgba(255 255 255 / 0.1);
+    transition: background-color 0.3s ease, transform 0.15s ease;
+    cursor: default;
+  }
+  tbody tr:hover {
+    background: rgba(0, 180, 216, 0.35);
+    transform: translateX(10px);
+  }
+  tbody td {
+    padding: 12px 20px;
+    vertical-align: top;
+    color: #d0e6ff;
+    font-size: 0.95rem;
+    word-break: break-word;
+    position: relative;
+  }
+  tbody td[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    background: #0077b6dd;
+    color: #eef2f7;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    max-width: 280px;
+    white-space: normal;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    z-index: 99;
+    top: 100%;
+    left: 0;
+    margin-top: 6px;
+  }
+  h2 {
+    margin-top: 48px;
+    color: #a6cdf1;
+    font-weight: 700;
+    font-size: 2rem;
+    text-align: center;
+    text-shadow: 0 0 6px #00b4d8aa;
+  }
+  #jsonOutput {
+    max-width: 900px;
+    width: 100%;
+    max-height: 360px;
+    background: rgba(255 255 255 / 0.07);
+    border-radius: 14px;
+    padding: 18px 20px;
+    font-family: 'Fira Mono', monospace;
+    font-size: 0.9rem;
+    overflow-y: auto;
+    color: #c7d4e8;
+    box-shadow: inset 0 0 15px rgba(0, 180, 216, 0.4);
+    transition: box-shadow 0.3s ease;
+  }
+  #jsonOutput:hover {
+    box-shadow: inset 0 0 25px rgba(0, 180, 216, 0.7);
+  }
+  @media (max-width: 768px) {
+    button {
+      width: 100%;
+      padding: 14px 0;
+      font-size: 1.1rem;
+    }
+    textarea {
+      font-size: 0.95rem;
+    }
+    tbody td {
+      font-size: 0.85rem;
+      padding: 10px 12px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>Scanner Web UI</h1>
+
+<label for="targetsInput">Insira URLs para scan (uma por linha):</label>
+<textarea id="targetsInput" placeholder="https://exemplo.com"></textarea><br />
+
+<button id="startScanBtn">Iniciar Scan</button>
+
+<div id="progress"></div>
+
+<table id="resultsTable" style="display:none;">
+  <thead>
+    <tr>
+      <th>URL</th>
+      <th>Categoria</th>
+      <th>Vulnerabilidade</th>
+      <th>Severidade</th>
+      <th>Detalhes</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<h2>Relatório JSON</h2>
+<pre id="jsonOutput"></pre>
+
+<script>
+  const startScanBtn = document.getElementById('startScanBtn');
+  const targetsInput = document.getElementById('targetsInput');
+  const progressDiv = document.getElementById('progress');
+  const resultsTable = document.getElementById('resultsTable');
+  const resultsBody = resultsTable.querySelector('tbody');
+  const jsonOutput = document.getElementById('jsonOutput');
+
+  function resetUI() {
+    progressDiv.textContent = '';
+    progressDiv.classList.remove('loading');
+    resultsBody.innerHTML = '';
+    resultsTable.style.display = 'none';
+    jsonOutput.textContent = '';
+    startScanBtn.disabled = false;
+  }
+
+  function showLoading() {
+    progressDiv.innerHTML = '<div class="spinner"></div> Escaneando... Aguarde, por favor.';
+  }
+
+  async function callScanApi(targets) {
+    const resp = await fetch('http://localhost:8000/scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ targets })
+    });
+    if (!resp.ok) throw new Error('Erro na API: ' + resp.statusText);
+    return await resp.json();
+  }
+
+  function showReport(report) {
+    if (!report || !report.findings) return;
+    resultsBody.innerHTML = '';
+    report.findings.forEach(f => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${f.target}</td>
+        <td>${f.category}</td>
+        <td>${f.name}</td>
+        <td>${f.severity}</td>
+        <td title="${f.evidence || ''}">${f.detail}</td>
+      `;
+      resultsBody.appendChild(tr);
+    });
+    resultsTable.style.display = 'table';
+    jsonOutput.textContent = JSON.stringify(report, null, 2);
+  }
+
+  startScanBtn.addEventListener('click', async () => {
+    resetUI();
+    const rawTargets = targetsInput.value.trim();
+    if (!rawTargets) {
+      alert('Informe ao menos uma URL.');
+      return;
+    }
+    const targets = rawTargets.split('\n').map(t => t.trim()).filter(Boolean);
+    try {
+      startScanBtn.disabled = true;
+      showLoading();
+      const report = await callScanApi(targets);
+      progressDiv.textContent = `Scan finalizado. Encontradas ${report.findings.length} vulnerabilidades.`;
+      showReport(report);
+    } catch (err) {
+      progressDiv.textContent = 'Erro ao executar scan: ' + err.message;
+      startScanBtn.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>
