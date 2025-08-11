@@ -10,7 +10,7 @@ import aiohttp
 from bs4 import BeautifulSoup
 from yarl import URL
 
-#Payloads 
+
 
 SQLI_PAYLOADS_ERROR_BASED = [
     "' OR '1'='1", "' OR 1=1 -- ", "\" OR \"1\"=\"1\""
@@ -48,7 +48,7 @@ COMMON_PATHS = [
     "/admin", "/login", "/wp-login.php", "/.git/", "/backup.zip", "/.env"
 ]
 
-#Data classes
+
 
 @dataclass
 class Finding:
@@ -72,7 +72,6 @@ class Report:
             "findings": [asdict(f) for f in self.findings],
         }, indent=2)
 
-#
 
 def is_url_https(url: str) -> bool:
     return url.lower().startswith("https://")
@@ -102,7 +101,6 @@ async def fetch(session: aiohttp.ClientSession, method: str, url: str, **kwargs)
     except Exception as e:
         return None, str(e)
 
-# ----------------------------- Checks -----------------------------
 
 async def check_security_headers(session: aiohttp.ClientSession, url: str) -> List[Finding]:
     findings = []
@@ -116,7 +114,7 @@ async def check_security_headers(session: aiohttp.ClientSession, url: str) -> Li
                 "strict-transport-security": "Strict-Transport-Security",
                 "referrer-policy": "Referrer-Policy",
                 "permissions-policy": "Permissions-Policy",
-                "feature-policy": "Feature-Policy",  # deprecated mas ainda usado
+                "feature-policy": "Feature-Policy", 
             }
             missing = [v for k, v in required.items() if k not in headers]
             if missing:
@@ -128,7 +126,7 @@ async def check_security_headers(session: aiohttp.ClientSession, url: str) -> Li
                     detail=f"Missing headers: {', '.join(missing)}",
                     evidence=json.dumps(dict(resp.headers))
                 ))
-            # Detectar headers que expõem info sensível
+
             if "server" in headers:
                 findings.append(Finding(
                     target=url,
@@ -224,7 +222,6 @@ async def test_sqli(session: aiohttp.ClientSession, base_url: str) -> List[Findi
         if not params:
             return findings
 
-        # Error-based SQLi
         for p in params:
             for payload in SQLI_PAYLOADS_ERROR_BASED:
                 try:
@@ -245,7 +242,6 @@ async def test_sqli(session: aiohttp.ClientSession, base_url: str) -> List[Findi
                 except Exception:
                     continue
 
-        # Time-based Blind SQLi
         for p in params:
             for payload in SQLI_PAYLOADS_TIME_BASED:
                 try:
@@ -309,7 +305,6 @@ async def test_xss(session: aiohttp.ClientSession, base_url: str) -> List[Findin
                 except Exception:
                     continue
 
-        # Teste XSS via User-Agent header
         for payload in XSS_PAYLOADS:
             try:
                 headers = {"User-Agent": payload}
@@ -579,7 +574,6 @@ async def check_logging_and_monitoring(session: aiohttp.ClientSession, base_url:
     ))
     return findings
 
-# ----------------------------- Orchestration -----------------------------
 
 async def scan_target(sem: asyncio.Semaphore, url: str) -> List[Finding]:
     async with sem:
@@ -618,3 +612,4 @@ async def run_scan(targets: List[str], concurrency: int = 5) -> Report:
         findings.extend(res)
     finished = time.time()
     return Report(started_at=started, finished_at=finished, findings=findings)
+
