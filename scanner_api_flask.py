@@ -4,7 +4,7 @@ import asyncio
 from scanner import run_scan
 
 app = Flask(__name__)
-CORS(app)  # <=== ADICIONADO
+CORS(app)
 
 @app.route('/')
 def home():
@@ -43,3 +43,4 @@ def scan():
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
+
