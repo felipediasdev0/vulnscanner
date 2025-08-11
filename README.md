@@ -36,9 +36,15 @@ pip install requests beautifulsoup4 argparse
 
 📊 Estrutura do Relatório
 Cada relatório gerado inclui:
+
 | Campo | Descrição | 
+
 | 🧩 Tipo de Vulnerabilidade | Ex: Injection, Broken Access Control | 
+
 | 🔗 URL Afetada | Endereço onde a falha foi detectada | 
+
 | 🧾 Evidências Técnicas | Detalhes da vulnerabilidade | 
+
 | 🚨 Severidade | Baixo, Médio, Alto ou Crítico | 
+
 | 🛠️ Recomendações | Sugestões práticas para mitigação | 
