@@ -33,6 +33,7 @@ pip install requests beautifulsoup4 argparse
 
 <img width="1912" height="946" alt="Captura de tela 2025-08-11 151807" src="https://github.com/user-attachments/assets/56f78e2d-4919-4f92-84e8-7b0aca327c8e" />
 
+
 📊 Estrutura do Relatório
 Cada relatório gerado inclui:
 | Campo | Descrição | 
